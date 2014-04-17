@@ -9,7 +9,7 @@
 // Used for the KAKU remote functionality
 const long transmitterAddress = 12877286;
 const int transmitterPin = 7;
-const int transmitterPeriod = 254;
+const int transmitterPeriod = 260;
 
 // Used for smart lights
 const byte ldrPin = A0;
@@ -28,7 +28,7 @@ short minutesThreshold = 18 * 60;
 byte timeArrayPosition = 0;
 unsigned long lastCheck;
 
-// KAKU transmitter
+// KAKU Transmitter
 NewRemoteTransmitter transmitter(transmitterAddress, transmitterPin, transmitterPeriod);
 
 // Ethernet details
@@ -71,22 +71,22 @@ void onData(SocketIOClient client, char *data) {
     int lightNumber;
 
     // Light 1
-    if (strstr(data, "1")) {
+    if (strstr(data, "0")) {
       lightNumber = 0;
     }
 
     // Light 2
-    if (strstr(data, "2")) {
+    if (strstr(data, "0")) {
       lightNumber = 1;
     }
 
     // Light 3
-    if (strstr(data, "3")) {
+    if (strstr(data, "0")) {
       lightNumber = 2;
     }
 
     // Light 4
-    if (strstr(data, "4")) {
+    if (strstr(data, "0")) {
       lightNumber = 3;
     }
 
