@@ -57,7 +57,7 @@ void setup() {
 }
 
 void loop() {
-  smartCheck();
+  //smartCheck();
   client.monitor();
 }
 
@@ -85,29 +85,41 @@ void onData(SocketIOClient client, char *data) {
     lightNumber = 3;
   }
 
+  // First disable the receiver
+  NewRemoteReceiver::disable();
+  
   // Turn on the light
   if (strstr(data, "on")) {
     transmitter.sendUnit(lightNumber, true);
   } else { // Turn off
     transmitter.sendUnit(lightNumber, false);
   }
+  
+  // Enable the receiver again
+  NewRemoteReceiver::enable();
 }
 
 // Callback function is called only when a valid code is received.
-void catchReceivedCode(NewRemoteCocode receivedCode) {
+void catchReceivedCode(NewRemoteCode receivedCode) {
+  
+  // Disable the receiver
+  NewRemoteReceiver::disable();
   
   // Take action only if the transmitter address is correct
   if (receivedCode.address == transmitterAddress) {
-    char lightCommand[7];
-    sprintf(lightCommand, "%01u:%s", receivedCode.unit, receivedCode.switchType == NewRemoteCode::off ? "false" : "true");
+    char lightCommand[16];
+    sprintf(lightCommand, "light%01u:%s", receivedCode.unit, receivedCode.switchType == NewRemoteCode::off ? "false" : "true");
     
     client.send(lightCommand);
   }
+  
+  // Enable the receiver again
+  NewRemoteReceiver::enable();
 }
 
 // Check for turing on the light using the smart function
 void smartCheck() {
-  Serial.println("Check");
+  //Serial.println("Check");
   short currentLightValue = analogRead(ldrPin);
   if (currentLightValue <= lightThreshold) {
     Serial.println("On");

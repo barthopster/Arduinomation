@@ -10,6 +10,18 @@ var light4 = false;
 
 var io = require('socket.io').listen(8181);
 var arduinoID;
+
+// Send current time every minute
+setInterval(function sendTime()
+{
+  var currentDate = new Date();
+  io.sockets.socket(arduinoID).emit('time', currentDate.getHours() + ","
+		+ currentDate.getMinutes()  + "," 
+		+ currentDate.getSeconds() + ","  
+		+ currentDate.getDate() + ","  
+		+ (currentDate.getMonth() + 1) + "," 
+		+ currentDate.getFullYear());
+}, timeInterval);
 		
 io.sockets.on('connection', function (socket)
 { 
@@ -50,33 +62,36 @@ io.sockets.on('connection', function (socket)
 	if (data == 'Say welcome')
 	{
 		arduinoID = socket.id;
-		
-		// Send current time every minute
-		setInterval(function sendTime()
-		{
-		  var currentDate = new Date();
-		  io.sockets.socket(arduinoID).emit('time', currentDate.getHours() + ","
-                + currentDate.getMinutes()  + "," 
-                + currentDate.getSeconds() + ","  
-                + currentDate.getDate() + ","  
-                + (currentDate.getMonth() + 1) + "," 
-                + currentDate.getFullYear());
-		}, timeInterval);
 	}
 	else
 	{
 		var lightCommandData = data.split(':');
-		if (lightCommandData[0] == "0")
-			light1 = lightCommandData[1];
-		if (lightCommandData[0] == "1")
-			light2 = lightCommandData[1];
-		if (lightCommandData[0] == "2")
-			light3 = lightCommandData[1];
-		if (lightCommandData[0] == "3")
-			light4 = lightCommandData[1];
-			
-		socket.broadcast.emit('accepted', { 'lightID' : lightCommandData[0],
-											'on' : lightCommandData[1] });
+		var lightCommandBoolean = lightCommandData[1] == "true" ? true : false;
+		var updatedLight;
+		
+		if (lightCommandData[0] == "light0")
+		{
+			updatedLight = "light1";
+			light1 = lightCommandBoolean;
+		}
+		if (lightCommandData[0] == "light1")
+		{
+			updatedLight = "light2";
+			light2 = lightCommandBoolean;
+		}
+		if (lightCommandData[0] == "light2")
+		{
+			updatedLight = "light3";
+			light3 = lightCommandBoolean;
+		}
+		if (lightCommandData[0] == "light3")
+		{
+			updatedLight = "light4";
+			light4 = lightCommandBoolean;
+		}
+		
+		socket.broadcast.emit('accepted', { 'lightID' : updatedLight,
+											'on' : lightCommandBoolean });
 	}
   });
   
