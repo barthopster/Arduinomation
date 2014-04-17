@@ -1,4 +1,5 @@
 #include <NewRemoteTransmitter.h>
+#include <NewRemoteReceiver.h>
 #include "SocketIOClient.h"
 #include "Ethernet.h"
 #include "SPI.h"
@@ -33,6 +34,9 @@ void setup() {
   
   // Second handshake
   client.send("Say welcome");
+  
+  // Init the receiver
+  NewRemoteReceiver::init(0, 2, catchReceivedCode);
 }
 
 void loop() {
@@ -68,5 +72,17 @@ void onData(SocketIOClient client, char *data) {
     transmitter.sendUnit(lightNumber, true);
   } else { // Turn off
     transmitter.sendUnit(lightNumber, false);
+  }
+}
+
+// Callback function is called only when a valid code is received.
+void catchReceivedCode(NewRemoteCocode receivedCode) {
+  
+  // Take action only if the transmitter address is correct
+  if (receivedCode.address == transmitterAddress) {
+    char lightCommand[7];
+    sprintf(lightCommand, "%01u:%s", receivedCode.unit, receivedCode.switchType == NewRemoteCode::off ? "false" : "true");
+    
+    client.send(lightCommand);
   }
 }

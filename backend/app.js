@@ -1,6 +1,7 @@
 // Credentials
 var username = "ardnmtn";
 var password = "hautomation";
+var timeInterval = 1000 * 5;
 
 var light1 = false;
 var light2 = false;
@@ -9,7 +10,7 @@ var light4 = false;
 
 var io = require('socket.io').listen(8181);
 var arduinoID;
-
+		
 io.sockets.on('connection', function (socket)
 { 
   // Connected is acknowledged, start the login proces
@@ -47,7 +48,36 @@ io.sockets.on('connection', function (socket)
   socket.on('message', function (data)
   {
 	if (data == 'Say welcome')
+	{
 		arduinoID = socket.id;
+		
+		// Send current time every minute
+		setInterval(function sendTime()
+		{
+		  var currentDate = new Date();
+		  io.sockets.socket(arduinoID).emit('time', currentDate.getHours() + ","
+                + currentDate.getMinutes()  + "," 
+                + currentDate.getSeconds() + ","  
+                + currentDate.getDate() + ","  
+                + (currentDate.getMonth() + 1) + "," 
+                + currentDate.getFullYear());
+		}, timeInterval);
+	}
+	else
+	{
+		var lightCommandData = data.split(':');
+		if (lightCommandData[0] == "0")
+			light1 = lightCommandData[1];
+		if (lightCommandData[0] == "1")
+			light2 = lightCommandData[1];
+		if (lightCommandData[0] == "2")
+			light3 = lightCommandData[1];
+		if (lightCommandData[0] == "3")
+			light4 = lightCommandData[1];
+			
+		socket.broadcast.emit('accepted', { 'lightID' : lightCommandData[0],
+											'on' : lightCommandData[1] });
+	}
   });
   
   socket.on('disconnect', function ()
