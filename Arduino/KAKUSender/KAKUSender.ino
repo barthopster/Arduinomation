@@ -70,3 +70,25 @@ void onData(SocketIOClient client, char *data) {
     transmitter.sendUnit(lightNumber, false);
   }
 }
+
+void timeUpdate(char *timeString)
+{
+  char *p = timeString;
+  char *str;
+  byte second, minute, hour, day, month;
+  short year;
+  if ((str = strtok_r(p, ",", &p)) != NULL)
+    hour = atoi(str);
+  if ((str = strtok_r(p, ",", &p)) != NULL)
+    minute = atoi(str);
+  if ((str = strtok_r(p, ",", &p)) != NULL)
+    second = atoi(str);
+  if ((str = strtok_r(p, ",", &p)) != NULL)
+    day  = atoi(str);
+  if ((str = strtok_r(p, ",", &p)) != NULL)
+    month = atoi(str);
+  if ((str = strtok_r(p, ",", &p)) != NULL)
+    year = atoi(str);
+
+  setTime(hour,minute,second,day,month,year);
+}
