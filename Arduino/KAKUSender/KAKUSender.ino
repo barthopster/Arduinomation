@@ -76,17 +76,17 @@ void onData(SocketIOClient client, char *data) {
     }
 
     // Light 2
-    if (strstr(data, "0")) {
+    if (strstr(data, "1")) {
       lightNumber = 1;
     }
 
     // Light 3
-    if (strstr(data, "0")) {
+    if (strstr(data, "2")) {
       lightNumber = 2;
     }
 
     // Light 4
-    if (strstr(data, "0")) {
+    if (strstr(data, "3")) {
       lightNumber = 3;
     }
 
@@ -96,7 +96,7 @@ void onData(SocketIOClient client, char *data) {
     // Turn on the light
     if (strstr(data, "on")) {
       transmitter.sendUnit(lightNumber, true);
-      updateSmartValues((hours()*60) + minutes(),analogRead(ldrPin));
+      updateSmartValues((hour()*60) + minute(),analogRead(ldrPin));
     } else { // Turn off
       transmitter.sendUnit(lightNumber, false);
     }
@@ -119,7 +119,7 @@ void catchReceivedCode(NewRemoteCode receivedCode) {
 
     client.send(lightCommand);
     
-    updateSmartValues((hours()*60) + minutes(),analogRead(ldrPin));
+    updateSmartValues((hour()*60) + minute(),analogRead(ldrPin));
   }
 
   // Enable the receiver again
@@ -130,7 +130,7 @@ void catchReceivedCode(NewRemoteCode receivedCode) {
 void smartCheck() {
   unsigned long curTime = millis();
   if (curTime > (lastCheck + interval) || lastCheck < curTime) {
-    lastCheck = curTime
+    lastCheck = curTime;
     //Serial.println("Check");
     short currentLightValue = analogRead(ldrPin);
     if (currentLightValue <= lightThreshold) {
