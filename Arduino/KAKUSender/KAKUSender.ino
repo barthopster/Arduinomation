@@ -1,4 +1,5 @@
 #include <NewRemoteTransmitter.h>
+#include <NewRemoteReceiver.h>
 #include "SocketIOClient.h"
 #include "Ethernet.h"
 #include "SPI.h"
@@ -44,14 +45,15 @@ void setup() {
   // Connect!
   if (!client.connect(hostname, port))
     Serial.println("Not connected.");
-  else
-    Serial.println("Connected.");
 
   // Catch any received data
   client.setDataArrivedDelegate(onData);
 
   // Second handshake
   client.send("Say welcome");
+  
+  // Init the receiver
+  NewRemoteReceiver::init(0, 2, catchReceivedCode);
 }
 
 void loop() {
@@ -91,19 +93,29 @@ void onData(SocketIOClient client, char *data) {
   }
 }
 
+// Callback function is called only when a valid code is received.
+void catchReceivedCode(NewRemoteCocode receivedCode) {
+  
+  // Take action only if the transmitter address is correct
+  if (receivedCode.address == transmitterAddress) {
+    char lightCommand[7];
+    sprintf(lightCommand, "%01u:%s", receivedCode.unit, receivedCode.switchType == NewRemoteCode::off ? "false" : "true");
+    
+    client.send(lightCommand);
+  }
+}
+
 // Check for turing on the light using the smart function
 void smartCheck() {
   Serial.println("Check");
   short currentLightValue = analogRead(ldrPin);
   if (currentLightValue <= lightThreshold) {
     Serial.println("On");
-    transmitter.sendGroup(true);
     transmitter.sendUnit(0, true);
     transmitter.sendUnit(1, true);
     transmitter.sendUnit(2, true);
     transmitter.sendUnit(3, true);
   }
-
 }
 
 void updateSmartValues() {
