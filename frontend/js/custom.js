@@ -49,15 +49,15 @@ jQuery(document).ready(function() {
         $('#contactform input').val('');
         $('#contactform textarea').val('');
         
-        var counter = 1;
+        var counter = 0;
         for (var property in data) {
 			if (data[property] == true)
 			{
-				$('#light' + counter).html('<a class="thumbnail on"><img src="http://placehold.it/350x250&text=Light+' + counter +  '" alt="" /><div><span id="light' + counter + 'spantext">Click to<br />turn off</span></div></a>');
+				$('#light' + counter).html('<a class="thumbnail on"><img src="http://placehold.it/350x250&text=Light+' + (counter + 1) +  '" alt="" /><div><span id="light' + counter + 'spantext">Click to<br />turn off</span></div></a>');
 			}
 			else
 			{
-				$('#light' + counter).html('<a class="thumbnail off"><img src="http://placehold.it/350x250&text=Light+' + counter +  '" alt="" /><div><span id="light' + counter + 'spantext">Click to<br />turn on</span></div></a>');
+				$('#light' + counter).html('<a class="thumbnail off"><img src="http://placehold.it/350x250&text=Light+' + (counter + 1) +  '" alt="" /><div><span id="light' + counter + 'spantext">Click to<br />turn on</span></div></a>');
 			}
 			
 			$('#light' + counter).bind('click', function(e) {
