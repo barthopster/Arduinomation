@@ -7,7 +7,7 @@ This is the backend part, existing of a NodeJS server application with SocketIO 
 
 ##How to install
 These steps explain how to run the backend
-* Download [node.js](http://nodejs.org)
+* Download and install [node.js](http://nodejs.org)
 * Open a command prompt of terminal inside the backend directory
 * Run: node app.js
 * The backend should now be running
