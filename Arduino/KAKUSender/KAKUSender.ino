@@ -13,9 +13,9 @@ const int transmitterPeriod = 260;
 
 // Used for smart lights
 const byte ldrPin = A0;
-const short numValues = 3;
-const short timeFrameBefore = 30;
-const short timeFrameAfter = 90;
+const short numValues = 4;
+const short timeFrameBefore = 30; // 0.5 Hour before
+const short timeFrameAfter = 150; // 2.5 Hour after
 const unsigned long interval = 1000;
 
 // Smart learning variables
@@ -28,11 +28,14 @@ short minutesThreshold = 18 * 60;
 byte timeArrayPosition = 0;
 unsigned long lastCheck;
 
+unsigned short lastDay = 0;
+
 // KAKU Transmitter
 NewRemoteTransmitter transmitter(transmitterAddress, transmitterPin, transmitterPeriod);
 
 // Ethernet details
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+byte mac[] = { 
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 char hostname[] = "ardnmtn.barthopster.nl";
 int port = 8181;
 
@@ -67,7 +70,8 @@ void loop() {
 void onData(SocketIOClient client, char *data) {
   if (strstr(data, "Time:")) {
     timeUpdate(data + 5);
-  } else {
+  } 
+  else {
     int lightNumber;
 
     // Light 1
@@ -96,8 +100,10 @@ void onData(SocketIOClient client, char *data) {
     // Turn on the light
     if (strstr(data, "on")) {
       transmitter.sendUnit(lightNumber, true);
-      updateSmartValues((hour()*60) + minute(),analogRead(ldrPin));
-    } else { // Turn off
+      // Enable this to update SmartValue updating, untested
+      // updateSmartValues();
+    } 
+    else { // Turn off
       transmitter.sendUnit(lightNumber, false);
     }
 
@@ -118,8 +124,9 @@ void catchReceivedCode(NewRemoteCode receivedCode) {
     sprintf(lightCommand, "light%01u:%s", receivedCode.unit, receivedCode.switchType == NewRemoteCode::off ? "false" : "true");
 
     client.send(lightCommand);
-    
-    updateSmartValues((hour()*60) + minute(),analogRead(ldrPin));
+
+    // Enable this to update SmartValue updating, untested
+    // updateSmartValues();
   }
 
   // Enable the receiver again
@@ -129,7 +136,7 @@ void catchReceivedCode(NewRemoteCode receivedCode) {
 // Check for turing on the light using the smart function
 void smartCheck() {
   unsigned long curTime = millis();
-  if (curTime > (lastCheck + interval) || lastCheck < curTime) {
+  if ((day() != lastDay)&&(curTime > (lastCheck + interval) || lastCheck < curTime)) {
     lastCheck = curTime;
     //Serial.println("Check");
     short currentLightValue = analogRead(ldrPin);
@@ -139,6 +146,7 @@ void smartCheck() {
       short curTimeMinutes = hour() * 60 + minute();
       if (curTimeMinutes > (minutesThreshold - timeFrameBefore) && curTimeMinutes < (minutesThreshold + timeFrameAfter)) {
         Serial.println("Lights on");
+        lastDay = day();
         NewRemoteReceiver::disable();
         for (int i = 0; i < 4; i++) {
           transmitter.sendUnit(i, true);
@@ -152,7 +160,11 @@ void smartCheck() {
   }
 }
 
-void updateSmartValues(short timeMinutes, short LDRLight) {
+// Adds current values to the smartlearning, currently not used because of lack of time
+void updateSmartValues() {
+  short timeMinutes = hour() * 60 + minute();
+  short LDRLight = analogRead(ldrPin);
+
   // Add the new values
   if (timeArrayPosition >= numValues)
     timeArrayPosition = 0;
@@ -196,3 +208,4 @@ void timeUpdate(char *timeString) {
 
   setTime(hour, minute, second, day, month, year);
 }
+
