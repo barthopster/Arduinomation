@@ -176,13 +176,13 @@ void updateSmartValues() {
   // Add the new values
   if (timeArrayPosition >= numValues)
     timeArrayPosition = 0;
-
   minutes[timeArrayPosition] = timeMinutes;
   lightThresholds[timeArrayPosition] = LDRLight;
 
+  // Set the new place in the array to add the values
   timeArrayPosition++;
 
-  // Calculate new on/off moments
+  // Calculate new on/off moments and thresholds
   for (int i = 0; i < numValues; i++) {
     minutesThreshold += minutes[i];
     lightThreshold += lightThresholds[i];

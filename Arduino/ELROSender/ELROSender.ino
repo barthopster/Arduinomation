@@ -6,7 +6,7 @@
 #include <Time.h>
 #include <string.h>
 
-// Used for the KAKU remote functionality
+// Used for the ERLO remote functionality
 const long transmitterAddress = 12;
 const byte transmitterPin = 7;
 const unsigned int transmitterPeriod = 320;
@@ -123,7 +123,8 @@ void catchReceivedCode(unsigned long receivedCode, unsigned int period) {
   RemoteReceiver::disable();
 
   /* This does work nice for the NetRemoteReciever, but not for the older RemoteReciever
-  /* Currently nothing is done with the intercepted code, it will work, but less nice
+  /* Currently nothing is done with the intercepted code, this code will work, but less nice
+  
    // Take action only if the transmitter address is correct
    if (receivedCode.address == transmitterAddress) {
    char lightCommand[16];
@@ -192,13 +193,13 @@ void updateSmartValues() {
   // Add the new values
   if (timeArrayPosition >= numValues)
     timeArrayPosition = 0;
-
   minutes[timeArrayPosition] = timeMinutes;
   lightThresholds[timeArrayPosition] = LDRLight;
 
+  // Set the new place in the array to add the values
   timeArrayPosition++;
 
-  // Calculate new on/off moments
+  // Calculate new on/off moments and thresholds
   for (int i = 0; i < numValues; i++) {
     minutesThreshold += minutes[i];
     lightThreshold += lightThresholds[i];
