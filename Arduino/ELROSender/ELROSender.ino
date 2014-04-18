@@ -22,13 +22,14 @@ const unsigned long interval = 1000;
 // Smart learning variables
 short lightThresholds[numValues];
 short lightThreshold = 200;
-
 short minutes[numValues];
 short minutesThreshold = 18 * 60; // The time to start, 18:00
-
 byte timeArrayPosition = 0;
+
+// Used to make the smartcheck be periodly
 unsigned long lastCheck;
 
+// Used check if the lights are already turned on for that evening
 unsigned short lastDay = 0;
 
 // KAKU Transmitter
@@ -140,6 +141,10 @@ void catchReceivedCode(unsigned long receivedCode, unsigned int period) {
 }
 
 // Check for turing on the light using the smart function
+// It check if it didnt already turned the light on,
+// after that the it is checked if it is dark,
+// after that it is checked if the moment is within the timeframe
+// and finally the lights are turned on
 void smartCheck() {
   unsigned long curTime = millis();
   if ((day() != lastDay)&&(curTime > (lastCheck + interval) || lastCheck < curTime)) {
@@ -176,7 +181,10 @@ void smartCheck() {
   }
 }
 
-// Adds current values to the smartlearning, currently not used because of lack of time
+// Adds current values to the smartlearning
+// It calculate the averages of the LDR measurements and time measure ments
+// These are used for turning the light on
+// Currently not used because of lack of time
 void updateSmartValues() {
   short timeMinutes = hour() * 60 + minute();
   short LDRLight = analogRead(ldrPin);
