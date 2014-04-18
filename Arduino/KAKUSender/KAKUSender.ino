@@ -68,7 +68,7 @@ void loop() {
 
 // Websocket message handler
 void onData(SocketIOClient client, char *data) {
-  if (strstr(data, "Time:")) {
+  if (strstr(data, "time")) {
     timeUpdate(data + 5);
   } 
   else {
@@ -187,9 +187,9 @@ void updateSmartValues() {
 // The used format is "hours,minutes,seconds,day,month,year"
 void timeUpdate(char *timeString) {
   Serial.print("Update time to: ");
-  Serial.println(timeString);
+  Serial.println(timeString+28);
 
-  char *p = timeString;
+  char *p = timeString+28;
   char *str;
   byte second, minute, hour, day, month;
   short year;
