@@ -146,7 +146,7 @@ void smartCheck() {
     //Serial.println("Check");
     short currentLightValue = analogRead(ldrPin);
     if (currentLightValue <= lightThreshold) {
-      Serial.println("Dark");
+      // Serial.println("Dark");
 
       short curTimeMinutes = hour() * 60 + minute();
       if (curTimeMinutes > (minutesThreshold - timeFrameBefore) && curTimeMinutes < (minutesThreshold + timeFrameAfter)) {
